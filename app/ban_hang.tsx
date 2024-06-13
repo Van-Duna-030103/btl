@@ -1,25 +1,22 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type RootStackParamList = {
-  HangHoa: undefined;
+  BanHang: undefined;
 };
 
-type Props = NativeStackScreenProps<RootStackParamList, 'HangHoa'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'BanHang'>;
 
-const HangHoaScreen: React.FC<Props> = () => {
-  const navigation = useNavigation();
-
+const BanHangScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer())}>
+        <TouchableOpacity onPress={() => navigation.openDrawer()}>
           <Icon name="menu" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Hàng hóa</Text>
+        <Text style={styles.headerTitle}>Bán hàng</Text>
         <View style={styles.headerIcons}>
           <Icon name="search" size={24} color="#fff" style={styles.icon} />
           <Icon name="sort" size={24} color="#fff" style={styles.icon} />
@@ -27,12 +24,9 @@ const HangHoaScreen: React.FC<Props> = () => {
         </View>
       </View>
       <View style={styles.content}>
-        <Text style={styles.text}>Thêm hàng hóa</Text>
-        <Icon name="inventory" size={100} color="#00bfa5" />
+        <Text style={styles.text}>Hiển thị bán hàng</Text>
+        <Icon name="shopping-cart" size={100} color="#00bfa5" />
       </View>
-      <TouchableOpacity style={styles.fab} onPress={() => { /* Logic thêm hàng hóa */ }}>
-        <Icon name="add" size={24} color="#fff" />
-      </TouchableOpacity>
     </View>
   );
 };
@@ -69,18 +63,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 20,
   },
-  fab: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    backgroundColor: '#00bfa5',
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 8,
-  },
 });
 
-export default HangHoaScreen;
+export default BanHangScreen;

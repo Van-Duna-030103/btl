@@ -1,38 +1,42 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import React, { useState, useEffect } from 'react';
+import { Text, View, StyleSheet, Button } from 'react-native';
+import { BarCodeScanner, BarCodeScannerResult } from 'expo-barcode-scanner';
 
-type RootStackParamList = {
-  HangHoa: undefined;
-};
+const ScanQRCodeScreen: React.FC = () => {
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [scanned, setScanned] = useState(false);
+  const [data, setData] = useState<string | null>(null);
 
-type Props = NativeStackScreenProps<RootStackParamList, 'HangHoa'>;
+  useEffect(() => {
+    const getBarCodeScannerPermissions = async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === 'granted');
+    };
 
-const HangHoaScreen: React.FC<Props> = () => {
-  const navigation = useNavigation();
+    getBarCodeScannerPermissions();
+  }, []);
+
+  const handleBarCodeScanned = ({ type, data }: BarCodeScannerResult) => {
+    setScanned(true);
+    setData(data);
+    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+  };
+
+  if (hasPermission === null) {
+    return <Text>Requesting for camera permission</Text>;
+  }
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer())}>
-          <Icon name="menu" size={24} color="#fff" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Hàng hóa</Text>
-        <View style={styles.headerIcons}>
-          <Icon name="search" size={24} color="#fff" style={styles.icon} />
-          <Icon name="sort" size={24} color="#fff" style={styles.icon} />
-          <Icon name="more-vert" size={24} color="#fff" style={styles.icon} />
-        </View>
-      </View>
-      <View style={styles.content}>
-        <Text style={styles.text}>Thêm hàng hóa</Text>
-        <Icon name="inventory" size={100} color="#00bfa5" />
-      </View>
-      <TouchableOpacity style={styles.fab} onPress={() => { /* Logic thêm hàng hóa */ }}>
-        <Icon name="add" size={24} color="#fff" />
-      </TouchableOpacity>
+      <BarCodeScanner
+        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+        style={StyleSheet.absoluteFillObject}
+      />
+      {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
+      {data && <Text style={styles.dataText}>Scanned Data: {data}</Text>}
     </View>
   );
 };
@@ -40,47 +44,15 @@ const HangHoaScreen: React.FC<Props> = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#333',
-    padding: 10,
-  },
-  headerTitle: {
-    color: '#fff',
-    fontSize: 20,
-  },
-  headerIcons: {
-    flexDirection: 'row',
-  },
-  icon: {
-    marginHorizontal: 10,
-  },
-  content: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  text: {
-    color: '#00bfa5',
-    fontSize: 24,
-    marginBottom: 20,
-  },
-  fab: {
+  dataText: {
+    fontSize: 18,
+    color: 'white',
     position: 'absolute',
-    bottom: 20,
-    right: 20,
-    backgroundColor: '#00bfa5',
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 8,
+    bottom: 50,
   },
 });
 
-export default HangHoaScreen;
+export default ScanQRCodeScreen;
